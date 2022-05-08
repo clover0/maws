@@ -21,6 +21,7 @@ func FindProfiles(filter string) []string {
 		panic(err)
 	}
 	defer f.Close()
+
 	scanner := bufio.NewScanner(f)
 	profiles := make([]string, 0)
 	re := regexp.MustCompile(AWS_PROFILE_NAME_FORMAT_REGEXP)
@@ -30,7 +31,6 @@ func FindProfiles(filter string) []string {
 		if len(matched) > 1 {
 			profiles = append(profiles, matched[1])
 		}
-
 	}
 
 	filtered := make([]string, 0)
