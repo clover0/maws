@@ -1,14 +1,18 @@
-package internal
+package command
 
-import "fmt"
+import (
+	"fmt"
+
+	"maws/internal/logger"
+)
 
 type Aggregator struct {
 	profiles []string
 	cmdArgs  []string
-	logger   Logger
+	logger   logger.Logger
 }
 
-func NewAggregator(profiles, cmdArgs []string, logger Logger) Aggregator {
+func NewAggregator(profiles, cmdArgs []string, logger logger.Logger) Aggregator {
 	return Aggregator{profiles: profiles, cmdArgs: cmdArgs, logger: logger}
 }
 
@@ -28,7 +32,7 @@ func (a *Aggregator) Do() {
 
 	stream := make(chan message)
 	for _, p := range a.profiles {
-		go func(args []string, prof string, logger Logger) {
+		go func(args []string, prof string, logger logger.Logger) {
 			c := NewAWSCommand(args, logger, prof)
 			r := prof + "---\n"
 			if err := c.Exec(); err != nil {

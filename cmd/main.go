@@ -2,8 +2,11 @@ package main
 
 import (
 	"flag"
-	"maws/internal"
 	"os"
+
+	"maws/internal/aws"
+	"maws/internal/command"
+	"maws/internal/logger"
 )
 
 func options() map[string]string {
@@ -14,7 +17,7 @@ func options() map[string]string {
 
 func main() {
 	debugEnv := os.Getenv("MAWS_DEBUG")
-	logger := internal.NewLogger(debugEnv)
+	logger := logger.NewLogger(debugEnv)
 
 	o := options()
 	profileFilter := flag.String(o["PROFILE_FILTER"], "", "Keyword for filtering profiles")
@@ -22,9 +25,9 @@ func main() {
 
 	args := flag.Args()
 
-	profiles := internal.FindProfiles(*profileFilter)
+	profiles := aws.FindProfiles(*profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
-	agg := internal.NewAggregator(profiles, args, logger)
+	agg := command.NewAggregator(profiles, args, logger)
 	agg.Do()
 }

@@ -1,9 +1,11 @@
-package internal
+package command
 
 import (
 	"context"
 	"os/exec"
 	"strings"
+
+	"maws/internal/logger"
 )
 
 const AWS_COMMAND = "aws"
@@ -16,10 +18,10 @@ type ICommand interface {
 type Command struct {
 	command []string
 	result  string
-	logger  Logger
+	logger  logger.Logger
 }
 
-func NewAWSCommand(command []string, logger Logger, profile string) ICommand {
+func NewAWSCommand(command []string, logger logger.Logger, profile string) ICommand {
 	awsCmd := make([]string, 0)
 	awsCmd = append(awsCmd, command...)
 	awsCmd = append(awsCmd, "--profile")
