@@ -16,7 +16,7 @@ type status int
 
 const (
 	SUCCESS = status(iota)
-	FAIL    = status(iota)
+	FAIL
 )
 
 type message struct {
@@ -34,13 +34,13 @@ func (a *Aggregator) Do() {
 			if err := c.Exec(); err != nil {
 				stream <- message{
 					status: FAIL,
-					result: r + c.Output(),
+					result: r + "(fail)" + c.Output(),
 				}
 				return
 			}
 			stream <- message{
 				status: SUCCESS,
-				result: c.Output(),
+				result: r + c.Output(),
 			}
 		}(a.cmdArgs, p, a.logger)
 	}
