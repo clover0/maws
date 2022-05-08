@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"maws/internal"
 	"os"
 )
@@ -26,10 +25,6 @@ func main() {
 	profiles := internal.FindProfiles(*profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
-	for _, p := range profiles {
-
-		c := internal.NewAWSCommand(args, logger, p)
-		c.Exec()
-		fmt.Println(c.Output())
-	}
+	agg := internal.NewAggregator(profiles, args, logger)
+	agg.Do()
 }
