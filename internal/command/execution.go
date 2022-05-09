@@ -1,8 +1,6 @@
 package command
 
 import (
-	"fmt"
-
 	"maws/internal/logger"
 )
 
@@ -10,10 +8,16 @@ type Aggregator struct {
 	profiles []string
 	cmdArgs  []string
 	logger   logger.Logger
+	reporter Reporter
 }
 
 func NewAggregator(profiles, cmdArgs []string, logger logger.Logger) Aggregator {
-	return Aggregator{profiles: profiles, cmdArgs: cmdArgs, logger: logger}
+	return Aggregator{
+		profiles: profiles,
+		cmdArgs:  cmdArgs,
+		logger:   logger,
+		reporter: NewConsoleOutput(),
+	}
 }
 
 type status int
@@ -25,26 +29,31 @@ const (
 
 type message struct {
 	status
-	result string
+	profile string
+	result  string
 }
 
 func (a *Aggregator) Do() {
+	if len(a.profiles) == 0 {
+		return
+	}
 
 	stream := make(chan message)
 	for _, p := range a.profiles {
 		go func(args []string, prof string, logger logger.Logger) {
 			c := NewAWSCommand(args, logger, prof)
-			r := prof + "---\n"
 			if err := c.Exec(); err != nil {
 				stream <- message{
-					status: FAIL,
-					result: r + "(fail)" + c.Output(),
+					status:  FAIL,
+					profile: prof,
+					result:  c.Output(),
 				}
 				return
 			}
 			stream <- message{
-				status: SUCCESS,
-				result: r + c.Output(),
+				status:  SUCCESS,
+				profile: prof,
+				result:  c.Output(),
 			}
 		}(a.cmdArgs, p, a.logger)
 	}
@@ -55,17 +64,24 @@ func (a *Aggregator) Do() {
 		case s := <-stream:
 			switch s.status {
 			case SUCCESS:
-				fmt.Println(s.result)
+				a.reporter.Output(a.decorateSuccess(s.profile, s.result))
 				finished += 1
 			case FAIL:
-				// TODO:
-				fmt.Println(s.result)
+				a.reporter.OutputErr(a.decorateFail(s.profile, s.result))
 				finished += 1
 			}
 		}
-		if finished >= len(a.profiles) {
+		if finished == 0 || finished >= len(a.profiles) {
 			break
 		}
 	}
 	return
+}
+
+func (a *Aggregator) decorateSuccess(profile, message string) string {
+	return profile + "---\n" + message
+}
+
+func (a *Aggregator) decorateFail(profile, message string) string {
+	return profile + " fail\n" + message
 }
