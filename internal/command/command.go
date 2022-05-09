@@ -8,6 +8,8 @@ import (
 	"maws/internal/logger"
 )
 
+//go:generate moq -out command_moq.go . ICommand
+
 const AWS_COMMAND = "aws"
 
 type ICommand interface {
