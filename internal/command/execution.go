@@ -5,18 +5,20 @@ import (
 )
 
 type Aggregator struct {
-	profiles []string
-	cmdArgs  []string
-	logger   logger.Logger
-	reporter Reporter
+	profiles   []string
+	cmdArgs    []string
+	cmdBuilder func(args []string, logger logger.Logger, profile string) ICommand
+	logger     logger.Logger
+	reporter   Reporter
 }
 
 func NewAggregator(profiles, cmdArgs []string, logger logger.Logger) Aggregator {
 	return Aggregator{
-		profiles: profiles,
-		cmdArgs:  cmdArgs,
-		logger:   logger,
-		reporter: NewConsoleOutput(),
+		profiles:   profiles,
+		cmdArgs:    cmdArgs,
+		cmdBuilder: NewAWSCommand,
+		logger:     logger,
+		reporter:   NewConsoleOutput(),
 	}
 }
 
@@ -41,7 +43,7 @@ func (a *Aggregator) Do() {
 	stream := make(chan message)
 	for _, p := range a.profiles {
 		go func(args []string, prof string, logger logger.Logger) {
-			c := NewAWSCommand(args, logger, prof)
+			c := a.cmdBuilder(args, logger, prof)
 			if err := c.Exec(); err != nil {
 				stream <- message{
 					status:  FAIL,
