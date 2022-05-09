@@ -25,7 +25,12 @@ func main() {
 
 	args := flag.Args()
 
-	profiles := aws.FindProfiles(*profileFilter)
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	p := home + "/.aws/config"
+	profiles := aws.FindProfiles(p, *profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
 	agg := command.NewAggregator(profiles, args, logger)

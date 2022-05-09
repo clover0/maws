@@ -7,16 +7,10 @@ import (
 	"strings"
 )
 
-const AWS_CONFIG_FILE_NAME = "config"
 const AWS_PROFILE_NAME_FORMAT_REGEXP = `\[profile (.*)\]`
 
-func FindProfiles(filter string) []string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-
-	f, err := os.Open(home + "/.aws/" + AWS_CONFIG_FILE_NAME)
+func FindProfiles(path string, filter string) []string {
+	f, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
