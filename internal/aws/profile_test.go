@@ -1,9 +1,10 @@
 package aws_test
 
 import (
-	"maws/internal/aws"
 	"os"
 	"testing"
+
+	"maws/internal/aws"
 )
 
 func createTempProfileFile() string {
