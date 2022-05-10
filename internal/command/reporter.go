@@ -2,6 +2,8 @@ package command
 
 import "fmt"
 
+//go:generate moq -out reporter_moq.go . Reporter
+
 type Reporter interface {
 	Output(text string)
 	OutputErr(text string)

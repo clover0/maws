@@ -33,6 +33,6 @@ func main() {
 	profiles := aws.FindProfiles(p, *profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
-	agg := command.NewAggregator(profiles, args, logger)
+	agg := command.NewAggregator(profiles, args, logger, command.NewConsoleOutput())
 	agg.Do()
 }

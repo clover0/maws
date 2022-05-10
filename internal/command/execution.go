@@ -12,13 +12,13 @@ type Aggregator struct {
 	reporter   Reporter
 }
 
-func NewAggregator(profiles, cmdArgs []string, logger logger.Logger) Aggregator {
+func NewAggregator(profiles, cmdArgs []string, logger logger.Logger, reporter Reporter) Aggregator {
 	return Aggregator{
 		profiles:   profiles,
 		cmdArgs:    cmdArgs,
 		cmdBuilder: NewAWSCommand,
 		logger:     logger,
-		reporter:   NewConsoleOutput(),
+		reporter:   reporter,
 	}
 }
 
@@ -35,9 +35,9 @@ type message struct {
 	result  string
 }
 
-func (a *Aggregator) Do() {
+func (a *Aggregator) Do() error {
 	if len(a.profiles) == 0 {
-		return
+		return nil
 	}
 
 	stream := make(chan message)
@@ -77,7 +77,7 @@ func (a *Aggregator) Do() {
 			break
 		}
 	}
-	return
+	return nil
 }
 
 func (a *Aggregator) decorateSuccess(profile, message string) string {
