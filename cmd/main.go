@@ -23,6 +23,13 @@ func main() {
 	profileFilter := flag.String(o["PROFILE_FILTER"], "", "Keyword for filtering profiles")
 	flag.Parse()
 
+	if a := os.Args; len(a) > 1 {
+		if a[1] == "version" {
+			command.VersionMessage()
+			return
+		}
+	}
+
 	args := flag.Args()
 
 	home, err := os.UserHomeDir()

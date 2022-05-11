@@ -2,7 +2,7 @@ name: development
 
 on:
   pull_request:
-    branches: *
+    types: [opened, reopened, synchronize]
 
 jobs:
   test:
@@ -17,6 +17,11 @@ jobs:
 
       - name: Build
         run: go build -v ./...
+
+      - name: Make mock
+        run: |
+          make bin/moq
+          make mock
 
       - name: Test
         run: go test -v ./...
