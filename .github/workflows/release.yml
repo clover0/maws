@@ -35,7 +35,5 @@ jobs:
           distribution: goreleaser
           version: latest
           args: release --rm-dist
-          dir: cmd
-          main: cmd
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
