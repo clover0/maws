@@ -2,7 +2,7 @@ package command
 
 import "fmt"
 
-const VERSION = "0.0.1"
+const VERSION = "0.0.3"
 
 func VersionMessage() {
 	out := fmt.Sprintf(`
