@@ -27,6 +27,10 @@ func FindProfiles(path string, filter string) []string {
 		}
 	}
 
+	if filter == "" {
+		return profiles
+	}
+
 	filtered := make([]string, 0)
 	for _, l := range profiles {
 		if strings.Contains(l, filter) {
