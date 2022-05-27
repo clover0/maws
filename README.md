@@ -14,7 +14,7 @@ Search for AWS resources across AWS multi account.
 
 # Quickstart
 ## Install
-1. Install AWS CLI v2. ([Install Guid](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
+1. Install AWS CLI v2. ([Install Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
 2. Install via Homebrew
 ```
 brew tap clover0/maws
@@ -41,7 +41,7 @@ maws <maws options> <aws cli command>
 [profile Account1.AdministratorAccess]
 sso_start_url = https://d-xxx.awsapps.com/start
 sso_region = us-east-1
-sso_account_name = Bastion
+sso_account_name = Account1
 sso_account_id = 12345678910 
 sso_role_name = AdministratorAccess
 region = ap-northeast-1
