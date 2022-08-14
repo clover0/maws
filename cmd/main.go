@@ -9,6 +9,8 @@ import (
 	"maws/internal/logger"
 )
 
+const AWS_DEFAULT_CONFIG_PATH = "/.aws/config"
+
 func options() map[string]string {
 	return map[string]string{
 		"PROFILE_FILTER": "profile-filter",
@@ -45,7 +47,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	p := home + "/.aws/config"
+	p := home + AWS_DEFAULT_CONFIG_PATH
 	profiles := aws.FindProfiles(p, *profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
