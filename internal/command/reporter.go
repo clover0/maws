@@ -9,18 +9,17 @@ type Reporter interface {
 	OutputErr(text string)
 }
 
-type ConsoleOutput struct {
-}
-
 func NewConsoleOutput() Reporter {
-	return ConsoleOutput{}
+	return consoleOutput{}
 }
 
-func (c ConsoleOutput) Output(text string) {
-	fmt.Println(text)
+func (c consoleOutput) Output(s string) {
+	fmt.Println(s)
 }
 
-// TODO:
-func (c ConsoleOutput) OutputErr(text string) {
-	fmt.Println(text)
+func (c consoleOutput) OutputErr(s string) {
+	fmt.Println(s)
+}
+
+type consoleOutput struct {
 }

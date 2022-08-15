@@ -14,6 +14,7 @@ const AWS_DEFAULT_CONFIG_PATH = "/.aws/config"
 func options() map[string]string {
 	return map[string]string{
 		"PROFILE_FILTER": "profile-filter",
+		"OUTPUT":         "output",
 	}
 }
 
@@ -23,6 +24,7 @@ func main() {
 
 	o := options()
 	profileFilter := flag.String(o["PROFILE_FILTER"], "", "Keyword for filtering profiles")
+	output := flag.String(o["OUTPUT"], "", "Ouput format(json or text")
 	flag.Parse()
 
 	a := os.Args
@@ -51,6 +53,15 @@ func main() {
 	profiles := aws.FindProfiles(p, *profileFilter)
 
 	logger.Debug("target profiles: %s\n", profiles)
-	agg := command.NewRunner(profiles, args, logger, command.NewConsoleOutput())
+	var outformat command.OutputFormat
+	switch *output {
+	case "json":
+		outformat = command.OutJson
+	case "text":
+		outformat = command.OutText
+	default:
+		outformat = command.OutJson
+	}
+	agg := command.NewRunner(profiles, args, logger, command.NewConsoleOutput(), outformat)
 	agg.Do()
 }

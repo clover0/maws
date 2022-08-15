@@ -1,8 +1,15 @@
 package command
 
 import (
+	"fmt"
+
+	"maws/internal/holder"
 	"maws/internal/logger"
 )
+
+type Runner interface {
+	Do() error
+}
 
 type runner struct {
 	profiles   []string
@@ -10,15 +17,21 @@ type runner struct {
 	cmdBuilder func(args []string, logger logger.Logger, profile string) ICommand
 	logger     logger.Logger
 	reporter   Reporter
+	holder     holder.Holder
 }
 
-func NewRunner(profiles, cmdArgs []string, logger logger.Logger, reporter Reporter) runner {
-	return runner{
+func NewRunner(profiles, cmdArgs []string, logger logger.Logger, reporter Reporter, out OutputFormat) Runner {
+	if out == OutText {
+		panic(fmt.Errorf("not implement other than json output format"))
+	}
+	// TODO: implement output format for text
+	return &runner{
 		profiles:   profiles,
 		cmdArgs:    cmdArgs,
 		cmdBuilder: NewAWSCommand,
 		logger:     logger,
 		reporter:   reporter,
+		holder:     holder.NewJsonHolder(),
 	}
 }
 
@@ -66,7 +79,7 @@ func (a *runner) Do() error {
 		case s := <-stream:
 			switch s.status {
 			case SUCCESS:
-				a.reporter.Output(a.decorateSuccess(s.profile, s.result))
+				a.holder.Add(s.profile, s.result)
 				finished += 1
 			case FAIL:
 				a.reporter.OutputErr(a.decorateFail(s.profile, s.result))
@@ -77,6 +90,7 @@ func (a *runner) Do() error {
 			break
 		}
 	}
+	a.reporter.Output(a.holder.OutAll())
 	return nil
 }
 
