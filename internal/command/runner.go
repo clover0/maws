@@ -1,24 +1,37 @@
 package command
 
 import (
+	"fmt"
+
+	"maws/internal/holder"
 	"maws/internal/logger"
 )
 
-type Aggregator struct {
+type Runner interface {
+	Do() error
+}
+
+type runner struct {
 	profiles   []string
 	cmdArgs    []string
 	cmdBuilder func(args []string, logger logger.Logger, profile string) ICommand
 	logger     logger.Logger
 	reporter   Reporter
+	holder     holder.Holder
 }
 
-func NewAggregator(profiles, cmdArgs []string, logger logger.Logger, reporter Reporter) Aggregator {
-	return Aggregator{
+func NewRunner(profiles, cmdArgs []string, logger logger.Logger, reporter Reporter, out OutputFormat) Runner {
+	if out == OutText {
+		panic(fmt.Errorf("not implement other than json output format"))
+	}
+	// TODO: implement output format for text
+	return &runner{
 		profiles:   profiles,
 		cmdArgs:    cmdArgs,
 		cmdBuilder: NewAWSCommand,
 		logger:     logger,
 		reporter:   reporter,
+		holder:     holder.NewJsonHolder(),
 	}
 }
 
@@ -35,7 +48,7 @@ type message struct {
 	result  string
 }
 
-func (a *Aggregator) Do() error {
+func (a *runner) Do() error {
 	if len(a.profiles) == 0 {
 		return nil
 	}
@@ -66,7 +79,7 @@ func (a *Aggregator) Do() error {
 		case s := <-stream:
 			switch s.status {
 			case SUCCESS:
-				a.reporter.Output(a.decorateSuccess(s.profile, s.result))
+				a.holder.Add(s.profile, s.result)
 				finished += 1
 			case FAIL:
 				a.reporter.OutputErr(a.decorateFail(s.profile, s.result))
@@ -77,13 +90,14 @@ func (a *Aggregator) Do() error {
 			break
 		}
 	}
+	a.reporter.Output(a.holder.OutAll())
 	return nil
 }
 
-func (a *Aggregator) decorateSuccess(profile, message string) string {
+func (a *runner) decorateSuccess(profile, message string) string {
 	return profile + "---\n" + message
 }
 
-func (a *Aggregator) decorateFail(profile, message string) string {
+func (a *runner) decorateFail(profile, message string) string {
 	return profile + " fail\n" + message
 }

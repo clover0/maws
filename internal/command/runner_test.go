@@ -36,7 +36,7 @@ func TestAggregator_Do(t *testing.T) {
 
 	for _, c := range tests {
 		t.Run(c.Name, func(t *testing.T) {
-			target := command.NewAggregator(c.Profiles, c.CmdArgs, loggerMock, reporterMock)
+			target := command.NewRunner(c.Profiles, c.CmdArgs, loggerMock, reporterMock, command.OutJson)
 			result := target.Do()
 			if result != nil {
 				t.Errorf("error")
