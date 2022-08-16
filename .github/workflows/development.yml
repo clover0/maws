@@ -2,26 +2,22 @@ name: development
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.18
-
       - name: Build
         run: go build -v ./...
-
       - name: Make mock
         run: |
           make bin/moq
           make mock
-
       - name: Test
         run: go test -v ./...
